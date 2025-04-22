@@ -1,0 +1,6 @@
+@SmartTodo_HostAddress = http://localhost:5290
+
+GET {{SmartTodo_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

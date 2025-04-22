@@ -1,0 +1,43 @@
+.todo-item {
+    width: 700px; padding: 8px; max-height: 150px;
+}
+
+.left-section {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.right-section {
+  text-align: right;
+}
+
+.card-text.category {
+  color: red;
+}
+
+.card-body {
+  padding: 8px;
+}
+
+.card-title {
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+
+.card-text {
+  font-size: 0.875rem;
+  margin-bottom: 5px;
+}
+
+.card-text.status {
+  font-size: 0.75rem;
+}
+
+.right-section .card-text.category {
+  font-size: 0.875rem;
+  margin-bottom: 5px;
+}
+
+.btn-sm {
+  font-size: 0.75rem;
+}

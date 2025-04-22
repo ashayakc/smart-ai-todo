@@ -1,0 +1,34 @@
+<div class="modal fade show" tabindex="-1" role="dialog" style="display: block;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ todo ? 'Edit Todo' : 'Add New Todo' }}</h5>
+        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="cancelModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" [(ngModel)]="title" name="title">
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" [(ngModel)]="description" name="description"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="category">Category</label>
+            <input type="text" class="form-control" id="category" [(ngModel)]="category" name="category">
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="completed" [(ngModel)]="completed" name="completed">
+            <label class="form-check-label" for="completed">Completed</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="cancelModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="saveTodo()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

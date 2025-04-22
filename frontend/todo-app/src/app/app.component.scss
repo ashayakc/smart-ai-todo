@@ -1,0 +1,69 @@
+.container-fluid {
+  height: 100vh;
+}
+
+.row {
+  height: 100%;
+}
+
+.vertical-section {
+  background-color: #f0f0f0;
+  height: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.todo-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chatbot-section {
+  background-color: #fff;
+  height: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex-grow: 1;
+  overflow-y: scroll;
+  padding: 10px;
+}
+
+.chat-input {
+  display: flex;
+  margin-top: 10px;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.chat-message {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.user-message {
+  background-color: #e0f7fa;
+  text-align: right;
+}
+
+.bot-message {
+  background-color: #f5f5f5;
+  text-align: left;
+}
+
+.col-md-4 {
+  width: 65%;
+}
+
+.col-md-8 {
+  width: 35%;
+}

@@ -1,0 +1,19 @@
+<!-- app.component.html -->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4">
+      <!-- Vertical Section -->
+      <div class="vertical-section">
+        <div class="todo-container">
+          <app-todo-form *ngIf="showTodoForm"></app-todo-form>
+          <app-todo-list (openAdd)="openAddModal()" (openEdit)="openEditModal($event)" [todosLoaded]="chatbot.todosUpdated"></app-todo-list>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <!-- Chatbot Section -->
+      <app-chatbot #chatbot></app-chatbot>
+    </div>
+  </div>
+  <app-todo-modal *ngIf="showModal" [todo]="selectedTodo" (save)="onSaveTodo($event)" (cancel)="onCloseModal()"></app-todo-modal>
+</div>
