@@ -6,7 +6,7 @@
       <div class="vertical-section">
         <div class="todo-container">
           <app-todo-form *ngIf="showTodoForm"></app-todo-form>
-          <app-todo-list (openAdd)="openAddModal()" (openEdit)="openEditModal($event)" [todosLoaded]="chatbot.todosUpdated"></app-todo-list>
+<app-todo-list (openAdd)="openAddModal()" (openEdit)="openEditModal($event)" [todosLoaded]="todosLoaded"></app-todo-list>
         </div>
       </div>
     </div>
