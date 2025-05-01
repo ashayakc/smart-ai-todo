@@ -19,6 +19,10 @@ export class TodoListComponent implements OnInit {
   @Output() openEdit = new EventEmitter<Todo>();
   @Input() todosLoaded: EventEmitter<void> | undefined;
 
+  clearTodos() {
+    this.loadTodos();
+  }
+
   constructor(private todoService: TodoService) {}
 
   ngOnInit(): void {
