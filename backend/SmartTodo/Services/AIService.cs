@@ -10,7 +10,7 @@ public interface IAIService
 {
     Task<string> CategorizeTodo(Todo todo);
 
-    Task<AIResponse> ProcessUserInstruction(string userInput);
+    Task<AIResponse> ProcessUserInstruction(string userInput, List<string> chatHistory);
 }
 
 public class AIService : IAIService
@@ -66,9 +66,10 @@ public class AIService : IAIService
         }
     }
 
-    public async Task<AIResponse> ProcessUserInstruction(string userInput)
+    public async Task<AIResponse> ProcessUserInstruction(string userInput, List<string> chatHistory)
     {
         // Use the prompt from above
+        string chatHistoryString = string.Join("\n", chatHistory);
         string prompt = @"
             You are a helpful assistant that understands user instructions related to a todo list.
 
@@ -89,7 +90,9 @@ public class AIService : IAIService
 
             If the user asks ""what can you do"" or a similar question, respond with: ""I can help you manage your todo list. You can ask me to create, update, delete, show, and count your todos.""  Do not provide any other information.
 
-            If the user asks a question that is not related to the todo list, respond with: ""I can only help with your todo list."" Do not provide any other information.
+            If the user asks a question that is not related to the todo list, respond with: ""I can only help with your todo list."" Do not provide any other information. 
+            
+            But let the user express some expressions like ""Ahh, I see"" or ""Thanks for your help"" or ""I appreciate your help"" or ""Ah"" or ""Sorry"".
 
             Here are some examples of user input and your corresponding JSON output:
 
@@ -129,24 +132,23 @@ public class AIService : IAIService
             User Input: ""Hi, how are you?""
             Your output: {""action"": ""non_todo_related""}
 
-
-            User Input: " + userInput + @"
+            Previous Chat History:" + chatHistoryString + @" 
+            Current User Input: " + userInput + @" 
             Your output:
-
             ";
 
         try
         {
-            var response = await _openAIClient.GetChatCompletionsAsync(
-                new ChatCompletionsOptions
+            var chatCompletionsOptions = new ChatCompletionsOptions
+            {
+                DeploymentName = _deploymentName,
+                Messages =
                 {
-                    DeploymentName = _deploymentName,
-                    Messages =
-                    {
-                        new ChatMessage(ChatRole.User, prompt)
-                    }
+                    new ChatMessage(ChatRole.User, prompt)
                 }
-            );
+            };
+
+            var response = await _openAIClient.GetChatCompletionsAsync(chatCompletionsOptions);
 
             string jsonResponse = response.Value.Choices[0].Message.Content.Trim();
             //Fixes the error The input was not valid JSON.
@@ -178,7 +180,7 @@ public class AIService : IAIService
 
                         // Try to find the Todo by title (or part of title)
                         string titleToSearch = aiResponse.Title;
-                        Todo existingTodo = await _dbContext.Todos.FirstOrDefaultAsync(t => t.Title.Contains(titleToSearch));
+                        Todo existingTodo = await _dbContext.Todos.FirstOrDefaultAsync(t => t.Title.Contains(titleToSearch, StringComparison.OrdinalIgnoreCase));
 
                         if (existingTodo != null)
                         {
@@ -194,10 +196,6 @@ public class AIService : IAIService
                             return aiResponse;
                         }
                         break;
-                    //case "confirm_delete_todo":
-                    //    aiResponse.Id = jsonNode["id"] != null ? (int?)jsonNode["id"].GetValue<int>() : null;
-                    //    aiResponse.Message = "Are you sure you want to delete " + jsonNode["summary"]?.ToString() + "?";
-                    //    break;
                     case "delete_todo":
                         aiResponse.Title = jsonNode["title"]?.ToString();
                         string titleToSearchAndDelete = aiResponse.Title;

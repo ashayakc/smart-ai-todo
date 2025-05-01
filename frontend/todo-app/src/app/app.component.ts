@@ -24,10 +24,15 @@ export class AppComponent implements AfterViewInit {
   selectedTodo: Todo | null = null;
   @Output() todosLoaded = new EventEmitter<void>();
   @ViewChild('resizable', { static: false }) resizable!: ElementRef;
+  @ViewChild(ChatbotComponent) chatbotComponent!: ChatbotComponent;
 
   constructor(private todoService: TodoService, @Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngAfterViewInit() {
+    this.chatbotComponent.todosUpdated.subscribe(() => {
+      this.loadTodos();
+    });
+
     if (isPlatformBrowser(this.platformId)) {
       const resizer = document.querySelector('.resizer') as HTMLElement;
       const leftSide = document.querySelector('.col-md-4') as HTMLElement;

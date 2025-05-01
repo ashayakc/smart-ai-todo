@@ -108,15 +108,21 @@ public class TodosController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("process")]
-    public async Task<IActionResult> ProcessInstruction([FromBody] string instruction)
+    public class ProcessInstructionRequest
     {
-        if (string.IsNullOrWhiteSpace(instruction))
+        public string Instruction { get; set; }
+        public List<string> ChatHistory { get; set; }
+    }
+
+    [HttpPost("process")]
+    public async Task<IActionResult> ProcessInstruction([FromBody] ProcessInstructionRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Instruction))
         {
             return BadRequest("Instruction cannot be null or empty.");
         }
 
-        var aiResponse = await _aIService.ProcessUserInstruction(instruction);
+        var aiResponse = await _aIService.ProcessUserInstruction(request.Instruction, request.ChatHistory);
 
         switch (aiResponse.Action)
         {

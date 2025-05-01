@@ -54,7 +54,12 @@ export class ChatbotComponent implements AfterViewInit, AfterViewChecked {
   }
 
   getBotResponse(message: string) {
-    this.http.post<any>(this.backendUrl, `"${message}"`, { headers: { 'Content-Type': 'application/json' } })
+    const requestBody = {
+      instruction: message,
+      chatHistory: this.messages.map(m => m.text)
+    };
+
+    this.http.post<any>(this.backendUrl, requestBody, { headers: { 'Content-Type': 'application/json' } })
       .subscribe(
         (response) => {
           let botResponse = response.summary;
