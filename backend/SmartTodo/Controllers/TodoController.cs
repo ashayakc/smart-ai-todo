@@ -134,21 +134,6 @@ public class TodosController : ControllerBase
                 {
                     return BadRequest("Todo ID is required for updating.");
                 }
-                try
-                {
-                    await Update(aiResponse.Todo);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TodoExists(aiResponse.Id.Value))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
                 if (aiResponse.Todo == null)
                 {
                     return NotFound($"Todo with ID {aiResponse.Id.Value} not found.");

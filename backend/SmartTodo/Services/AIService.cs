@@ -188,9 +188,12 @@ public class AIService : IAIService
                         if (existingTodo != null)
                         {
                             aiResponse.Id = existingTodo.Id;
-                            Todo updateTodo = new Todo { Id = existingTodo.Id, Title = aiResponse.Title, Description = aiResponse.Description };
-                            updateTodo.Category = await CategorizeTodo(updateTodo);
-                            aiResponse.Todo = updateTodo;
+                            existingTodo.Title = aiResponse.Title;
+                            existingTodo.Description = aiResponse.Description;
+                            existingTodo.Category = await CategorizeTodo(existingTodo);
+                            _dbContext.Update(existingTodo);
+                            await _dbContext.SaveChangesAsync();
+                            aiResponse.Todo = existingTodo;
                         }
                         else
                         {
