@@ -99,11 +99,14 @@ public class AIService : IAIService
             User Input: ""Add a task to buy milk and the description is to get 2% milk from the store""
             Your output: {""action"": ""create_todo"", ""title"": ""Buy milk"", ""description"": ""Get 2% milk""}
 
-            User Input: ""Update the task with the title Clean room, set the description to clean my room""
-            Your output: {""action"": ""update_todo"", ""title"": ""Clean room"", ""description"": ""Clean room""}
+            User Input: ""Update the task with the title Clean room to Clean cabin""
+            Your output: {""action"": ""update_todo"", ""title"": ""Clean room"", ""newtitle"": ""Clean cabin"", ""newdescription"": ""Clean cabin""}
 
             User Input: ""Update the task which contains 'Clean', set the description to 'Clean room'""
-            Your output: {""action"": ""update_todo"", ""title"": ""Clean room"", ""description"": ""Clean room""}
+            Your output: {""action"": ""update_todo"", ""title"": ""Clean room"", ""newtitle"": ""Clean room"", ""newdescription"": ""Clean room""}
+
+            User Input: ""Update Pay Bills to Pay Utilities""
+            Your output: {""action"": ""update_todo"", ""title"": ""Pay Bills"", ""newtitle"": ""Pay Utilities"", ""newdescription"": ""Pay rent and utilities""}
 
             User Input: ""Delete the todo with id 3""
             Your output: {""action"": ""delete_todo"", ""id"": 3, ""summary"": ""Deleted todo: Buy milk""}
@@ -175,11 +178,11 @@ public class AIService : IAIService
                         aiResponse.Todo = newTodo;
                         break;
                     case "update_todo":
-                        aiResponse.Title = jsonNode["title"]?.ToString();
-                        aiResponse.Description = jsonNode["description"]?.ToString();
+                        aiResponse.Title = jsonNode["newtitle"]?.ToString();
+                        aiResponse.Description = jsonNode["newdescription"]?.ToString();
 
                         // Try to find the Todo by title (or part of title)
-                        string titleToSearch = aiResponse.Title;
+                        string titleToSearch = jsonNode["title"]?.ToString();
                         Todo existingTodo = await _dbContext.Todos.FirstOrDefaultAsync(t => t.Title.Contains(titleToSearch, StringComparison.OrdinalIgnoreCase));
 
                         if (existingTodo != null)
