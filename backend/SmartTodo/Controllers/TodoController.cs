@@ -164,6 +164,8 @@ public class TodosController : ControllerBase
                 return Ok(new { summary = "Available actions", data = new { message = "I can help you manage your todo list. You can ask me to create, update, delete, show, and count your todos." } });
             case "non_todo_related":
                 return Ok(new { summary = "Non-todo related", data = new { message = "I can only help with your todo list." } });
+            case "clear_search":
+                return Ok(new { summary = "Search filter cleared", data = new { action = "clear_search" } });
             case "error":
                 return StatusCode(500, new { summary = "Error", data = new { message = aiResponse.Message } }); // Return 500 for internal server error
             default:

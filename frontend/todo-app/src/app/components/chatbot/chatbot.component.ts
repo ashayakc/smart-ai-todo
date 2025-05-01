@@ -78,7 +78,10 @@ export class ChatbotComponent implements AfterViewInit, AfterViewChecked {
           if (response.data && response.data.action === "search_todos" && response.data.todos) {
             this.todos = response.data.todos;
             this.todosUpdated.emit(this.todos); // Emit todos
-          } else {
+          } else if (response.data && response.data.action === "clear_search") {
+            this.todosUpdated.emit(); // Emit event to refresh todo list
+          }
+          else {
             this.todosUpdated.emit(); // Emit event after successful response
           }
         },

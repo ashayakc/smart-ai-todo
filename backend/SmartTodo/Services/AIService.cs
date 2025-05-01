@@ -78,6 +78,7 @@ public class AIService : IAIService
             - update_todo: Update an existing todo item.
             - delete_todo: Delete an existing todo item.
             - search_todos: Search todo items.
+            - clear_search: Clears the search filter.
             - count_todos_by_category: Count the number of todo items in a specific category.
 
             When creating or updating a todo, rephrase the title to a maximum of 5 words and shorten the description to a maximum of 10 words, improving grammar.  If the user does not provide enough information to understand the todo, ask for more details. 
@@ -133,6 +134,9 @@ public class AIService : IAIService
 
             User Input: ""What can you do?""
             Your output: {""action"": ""what_can_you_do""}
+
+            User Input: ""Clear the search filter""
+            Your output: {""action"": ""clear_search""}
 
             User Input: ""Hi, how are you?""
             Your output: {""action"": ""non_todo_related""}
@@ -237,6 +241,8 @@ public class AIService : IAIService
                         aiResponse.Message = jsonNode["message"]?.ToString();
                         break;
                     case "what_can_you_do":
+                        break;
+                    case "clear_search":
                         break;
                     case "non_todo_related":
                         break;
