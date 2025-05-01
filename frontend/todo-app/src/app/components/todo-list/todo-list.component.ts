@@ -14,7 +14,7 @@ import { Output, EventEmitter, Input } from '@angular/core';
   styleUrls: ['./todo-list.component.scss']
 })
 export class TodoListComponent implements OnInit {
-  todos: Todo[] = [];
+  @Input() todos: Todo[] = [];
   @Output() openAdd = new EventEmitter<void>();
   @Output() openEdit = new EventEmitter<Todo>();
   @Input() todosLoaded: EventEmitter<void> | undefined;

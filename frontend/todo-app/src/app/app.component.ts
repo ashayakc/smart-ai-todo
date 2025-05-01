@@ -22,6 +22,7 @@ export class AppComponent implements AfterViewInit {
   showTodoForm = false;
   showModal = false;
   selectedTodo: Todo | null = null;
+  todos: Todo[] = [];
   @Output() todosLoaded = new EventEmitter<void>();
   @ViewChild('resizable', { static: false }) resizable!: ElementRef;
   @ViewChild(ChatbotComponent) chatbotComponent!: ChatbotComponent;
@@ -29,8 +30,12 @@ export class AppComponent implements AfterViewInit {
   constructor(private todoService: TodoService, @Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngAfterViewInit() {
-    this.chatbotComponent.todosUpdated.subscribe(() => {
-      this.loadTodos();
+    this.chatbotComponent.todosUpdated.subscribe((todos: any) => {
+      if (todos) {
+        this.todos = todos;
+      } else {
+        this.loadTodos();
+      }
     });
 
     if (isPlatformBrowser(this.platformId)) {
@@ -97,6 +102,8 @@ export class AppComponent implements AfterViewInit {
   }
 
   loadTodos() {
-    this.todosLoaded.emit();
+    this.todoService.getTodos().subscribe(data => {
+      this.todos = data;
+    });
   }
 }

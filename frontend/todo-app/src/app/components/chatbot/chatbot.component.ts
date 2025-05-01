@@ -74,7 +74,13 @@ export class ChatbotComponent implements AfterViewInit, AfterViewChecked {
           }
           this.messages.push({ text: botResponse, isUser: false });
           this.isScrolledToBottom = false;
-          this.todosUpdated.emit(); // Emit event after successful response
+
+          if (response.data && response.data.action === "search_todos" && response.data.todos) {
+            this.todos = response.data.todos;
+            this.todosUpdated.emit(this.todos); // Emit todos
+          } else {
+            this.todosUpdated.emit(); // Emit event after successful response
+          }
         },
         (error) => {
           console.error('Error fetching bot response:', error);

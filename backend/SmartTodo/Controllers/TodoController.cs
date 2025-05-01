@@ -154,7 +154,7 @@ public class TodosController : ControllerBase
                 return Ok(new { summary = "Deleted todo", data = new { id = aiResponse.Id } });
             case "search_todos":
                 var todos = await SearchTodosByKey(aiResponse.Title);
-                return Ok(new { summary = $"Showing todos with the search key: {aiResponse.Title}", data = todos });
+                return Ok(new { summary = $"Showing todos with the search key: {aiResponse.Title}", data = new { todos, action = "search_todos" } });
             case "count_todos_by_category":
                 var count = await CountTodosByCategory(aiResponse.Category);
                 return Ok(new { summary = $"Counted todos in category {aiResponse.Category}", data = new { category = aiResponse.Category, count } });
