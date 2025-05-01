@@ -152,9 +152,9 @@ public class TodosController : ControllerBase
                 }
                 await DeleteTodo(aiResponse.Id.Value);
                 return Ok(new { summary = "Deleted todo", data = new { id = aiResponse.Id } });
-            case "show_todos":
-                var todos = await GetTodos();
-                return Ok(new { summary = "Showed all todos", data = todos });
+            case "search_todos":
+                var todos = await SearchTodosByKey(aiResponse.Title);
+                return Ok(new { summary = $"Showing todos with the search key: {aiResponse.Title}", data = todos });
             case "count_todos_by_category":
                 var count = await CountTodosByCategory(aiResponse.Category);
                 return Ok(new { summary = $"Counted todos in category {aiResponse.Category}", data = new { category = aiResponse.Category, count } });
@@ -179,5 +179,12 @@ public class TodosController : ControllerBase
     private Task<int> CountTodosByCategory(string category)
     {
         return _context.Todos.CountAsync(e => e.Category == category);
+    }
+
+    private Task<List<Todo>> SearchTodosByKey(string searchKey)
+    {
+        return _context.Todos.Where(e => e.Title.Contains(searchKey, StringComparison.OrdinalIgnoreCase)
+                                    || e.Description.Contains(searchKey, StringComparison.OrdinalIgnoreCase))
+            .ToListAsync();
     }
 }

@@ -77,7 +77,7 @@ public class AIService : IAIService
             - create_todo: Create a new todo item.
             - update_todo: Update an existing todo item.
             - delete_todo: Delete an existing todo item.
-            - show_todos: Show all todo items.
+            - search_todos: Search todo items.
             - count_todos_by_category: Count the number of todo items in a specific category.
 
             When creating or updating a todo, rephrase the title to a maximum of 5 words and shorten the description to a maximum of 10 words, improving grammar.  If the user does not provide enough information to understand the todo, ask for more details. 
@@ -88,7 +88,9 @@ public class AIService : IAIService
             
             For delete_todo, if the user provides a title or partial title, you MUST use that information to find the corresponding todo ID.  Do not ask the user for the ID.  If you cannot find a matching todo, respond with a clarification_needed action.
 
-            If the user asks ""what can you do"" or a similar question, respond with: ""I can help you manage your todo list. You can ask me to create, update, delete, show, and count your todos.""  Do not provide any other information.
+            For search_todos, user can say ""Search todos which has ""Clean"" word in it"" or ""Search todos by ""Clean"""" or ""Search starting with ""Clean"""". If you cannot find a search key, respond with a clarification_needed action.
+
+            If the user asks ""what can you do"" or a similar question, respond with: ""I can help you manage your todo list. You can ask me to create, update, delete, search, and count your todos.""  Do not provide any other information.
 
             If the user asks a question that is not related to the todo list, respond with: ""I can only help with your todo list."" Do not provide any other information. 
             
@@ -111,8 +113,8 @@ public class AIService : IAIService
             User Input: ""Delete the todo with id 3""
             Your output: {""action"": ""delete_todo"", ""id"": 3, ""summary"": ""Deleted todo: Buy milk""}
 
-            User Input: ""Show me all the todos""
-            Your output: {""action"": ""show_todos""}
+            User Input: ""Search todos which contains word clean""
+            Your output: {""action"": ""search_todos"", ""title"": ""clean"" }
 
             User Input: ""How many todos are in Home""
             Your output: {""action"": ""count_todos_by_category"", ""category"": ""Home""}
@@ -225,8 +227,8 @@ public class AIService : IAIService
                             return aiResponse;
                         }
                         break;
-                    case "show_todos":
-                        // Handled in controller
+                    case "search_todos":
+                        aiResponse.Title = jsonNode["title"]?.ToString();
                         break;
                     case "count_todos_by_category":
                         aiResponse.Category = jsonNode["category"]?.ToString();
