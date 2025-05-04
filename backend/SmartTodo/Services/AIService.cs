@@ -142,19 +142,16 @@ public class AIService : IAIService
 
             User Input: ""Hi, how are you?""
             Your output: {""action"": ""non_todo_related""}
-
-            Previous Chat History:" + chatHistoryString + @" 
-            Current User Input: " + userInput + @" 
-            Your output:
             ";
 
         try
         {
-            var response = await _openAIClient.GetChatClient(_deploymentName).CompleteChatAsync(
-                new List<ChatMessage>
-                {
-                    new UserChatMessage(prompt)
-                });
+            var chatMessages = new List<ChatMessage>
+            {
+                new SystemChatMessage(prompt),
+                new UserChatMessage(userInput)
+            };
+            var response = await _openAIClient.GetChatClient(_deploymentName).CompleteChatAsync(chatMessages);
 
             string jsonResponse = response.Value.Content[0].Text;
             //Fixes the error The input was not valid JSON.
@@ -162,6 +159,7 @@ public class AIService : IAIService
             {
                 jsonResponse = "{ \"action\": \"non_todo_related\", \"message\": \"I can only help with your todo list.\" }";
             }
+            chatMessages.Add(new AssistantChatMessage(jsonResponse));
             JsonNode jsonNode = JsonNode.Parse(jsonResponse);
 
 
