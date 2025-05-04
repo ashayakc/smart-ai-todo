@@ -78,6 +78,7 @@ public class AIService : IAIService
             - update_todo: Update an existing todo item.
             - delete_todo: Delete an existing todo item.
             - search_todos: Search todo items.
+            - filter_todos: Filter todo items by category.
             - clear_search: Clears the search filter.
             - count_todos_by_category: Count the number of todo items in a specific category.
 
@@ -91,7 +92,9 @@ public class AIService : IAIService
 
             For search_todos, user can say ""Search todos which has ""Clean"" word in it"" or ""Search todos by ""Clean"""" or ""Search starting with ""Clean"""". If you cannot find a search key, respond with a clarification_needed action.
 
-            If the user asks ""what can you do"" or a similar question, respond with: ""I can help you manage your todo list. You can ask me to create, update, delete, search, and count your todos.""  Do not provide any other information.
+            For filter_todos, user can say ""Filter todos where category is ""Business"""" or ""Filter todos by ""House"""" or ""Show all todos with ""Shopping"" category"". If you cannot find a filter key, respond with a clarification_needed action.
+
+            If the user asks ""what can you do"" or a similar question, respond with: ""I can help you manage your todo list. You can ask me to create, update, delete, search, filter and count your todos.""  Do not provide any other information.
 
             If the user asks a question that is not related to the todo list, respond with: ""I can only help with your todo list."" Do not provide any other information. 
             
@@ -116,6 +119,9 @@ public class AIService : IAIService
 
             User Input: ""Search todos which contains word clean""
             Your output: {""action"": ""search_todos"", ""title"": ""clean"" }
+
+            User Input: ""Filter todos by Shopping category""
+            Your output: {""action"": ""filter_todos"", ""title"": ""shopping"" }
 
             User Input: ""How many todos are in Home""
             Your output: {""action"": ""count_todos_by_category"", ""category"": ""Home""}
@@ -232,6 +238,9 @@ public class AIService : IAIService
                         }
                         break;
                     case "search_todos":
+                        aiResponse.Title = jsonNode["title"]?.ToString();
+                        break;
+                    case "filter_todos":
                         aiResponse.Title = jsonNode["title"]?.ToString();
                         break;
                     case "count_todos_by_category":
