@@ -1,10 +1,11 @@
 ﻿using Azure;
-using Azure.AI.OpenAI;
 using SmartTodo;
 using System.Text.Json.Nodes;
 using System.Text.Json;
 using SmartTodo.Services;
 using Microsoft.EntityFrameworkCore;
+using OpenAI.Chat;
+using Azure.AI.OpenAI;
 
 public interface IAIService
 {
@@ -15,7 +16,7 @@ public interface IAIService
 
 public class AIService : IAIService
 {
-    private readonly OpenAIClient _openAIClient;
+    private readonly AzureOpenAIClient _openAIClient;
     private readonly string _deploymentName;
     private readonly IConfiguration _configuration; 
     private readonly TodoDbContext _dbContext; 
@@ -26,7 +27,7 @@ public class AIService : IAIService
         string endpoint = configuration["AzureOpenAI:Endpoint"];
         _deploymentName = configuration["AzureOpenAI:DeploymentName"];
         _configuration = configuration; // Store
-        _openAIClient = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
+        _openAIClient = new AzureOpenAIClient(new Uri(endpoint!), new AzureKeyCredential(apiKey!));
         _dbContext = dbContext; // Store the database context
     }
 
@@ -45,18 +46,13 @@ public class AIService : IAIService
 
         try
         {
-            var response = await _openAIClient.GetChatCompletionsAsync(
-                new ChatCompletionsOptions
+            var response = await _openAIClient.GetChatClient(_deploymentName).CompleteChatAsync(
+                new List<ChatMessage>
                 {
-                    DeploymentName = _deploymentName,
-                    Messages =
-                    {
-                        new ChatMessage(ChatRole.User, prompt)
-                    }
-                }
-            );
+                    new UserChatMessage(prompt)
+                });
 
-            string category = response.Value.Choices[0].Message.Content;
+            string category = response.Value.Content[0].Text;
             return category.Trim();
         }
         catch (RequestFailedException ex)
@@ -154,18 +150,13 @@ public class AIService : IAIService
 
         try
         {
-            var chatCompletionsOptions = new ChatCompletionsOptions
-            {
-                DeploymentName = _deploymentName,
-                Messages =
+            var response = await _openAIClient.GetChatClient(_deploymentName).CompleteChatAsync(
+                new List<ChatMessage>
                 {
-                    new ChatMessage(ChatRole.User, prompt)
-                }
-            };
+                    new UserChatMessage(prompt)
+                });
 
-            var response = await _openAIClient.GetChatCompletionsAsync(chatCompletionsOptions);
-
-            string jsonResponse = response.Value.Choices[0].Message.Content.Trim();
+            string jsonResponse = response.Value.Content[0].Text;
             //Fixes the error The input was not valid JSON.
             if (!jsonResponse.StartsWith("{") || !jsonResponse.EndsWith("}"))
             {
