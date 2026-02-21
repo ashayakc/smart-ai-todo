@@ -1,0 +1,21 @@
+name: AI Issue Agent
+
+on:
+  issues:
+    types: [labeled]  # triggers when you add a label like "ai-implement"
+
+jobs:
+  implement-issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run AI Agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          REPO: ${{ github.repository }}
+        run: |
+          npm install -g @anthropic-ai/sdk
+          node agent.js
