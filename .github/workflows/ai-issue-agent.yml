@@ -18,12 +18,11 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install @anthropic-ai/bedrock-sdk @octokit/rest
+        run: npm install @google/generative-ai @octokit/rest
 
       - name: Run AI Agent
         env:
-          BEDROCK_API_KEY: ${{ secrets.BEDROCK_API_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
