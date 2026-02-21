@@ -18,6 +18,7 @@ export class TodoModalComponent {
   description: string = '';
   category: string = '';
   completed: boolean = false;
+  dueDate: string = '';
 
   ngOnInit() {
     if (this.todo) {
@@ -25,6 +26,12 @@ export class TodoModalComponent {
       this.description = this.todo.description ?? '';
       this.category = this.todo.category ?? '';
       this.completed = this.todo.completed ?? false;
+      // Convert ISO string to date input format (YYYY-MM-DD)
+      if (this.todo.dueDate) {
+        this.dueDate = this.todo.dueDate.split('T')[0];
+      } else {
+        this.dueDate = '';
+      }
     }
   }
 
@@ -34,7 +41,8 @@ export class TodoModalComponent {
       title: this.title,
       description: this.description,
       category: this.category,
-      completed: this.completed
+      completed: this.completed,
+      dueDate: this.dueDate || undefined
     };
     this.save.emit(newTodo);
   }
