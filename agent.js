@@ -1,8 +1,12 @@
-const Anthropic = require("@anthropic-ai/sdk");
+const { AnthropicBedrock } = require("@anthropic-ai/sdk");
 const { Octokit } = require("@octokit/rest");
 
 // ─── Setup ───────────────────────────────────────────────────────────────────
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const anthropic = new AnthropicBedrock({
+  awsAccessKey: process.env.AWS_ACCESS_KEY_ID,
+  awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
+  awsRegion:    process.env.AWS_REGION
+});
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 const [OWNER, REPO] = process.env.REPO.split("/");
@@ -10,6 +14,7 @@ const ISSUE_NUMBER = parseInt(process.env.ISSUE_NUMBER);
 const ISSUE_TITLE = process.env.ISSUE_TITLE;
 const ISSUE_BODY = process.env.ISSUE_BODY;
 const BRANCH = `feature/issue-${ISSUE_NUMBER}`;
+const MODEL  = "anthropic.claude-sonnet-4-5-20250929-v1:0";
 
 // ─── Tools (Octokit functions exposed to Claude) ──────────────────────────────
 const TOOLS = [
@@ -202,7 +207,7 @@ Rules:
   // Agentic loop — keeps running until Claude stops calling tools
   while (true) {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-5",
+      model: MODEL,
       max_tokens: 8096,
       tools: TOOLS,
       messages
