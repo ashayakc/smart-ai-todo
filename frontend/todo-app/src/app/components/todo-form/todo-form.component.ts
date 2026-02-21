@@ -16,7 +16,8 @@ export class TodoFormComponent implements OnInit {
     id: 0,
     title: '',
     description: '',
-    completed: false
+    completed: false,
+    dueDate: undefined
   };
   isEditMode = false;
 
@@ -33,6 +34,10 @@ export class TodoFormComponent implements OnInit {
       this.todoService.getTodo(+id).subscribe(t => {
         if (t) {
           this.todo = { ...t };
+          // Convert ISO string to date input format (YYYY-MM-DD)
+          if (this.todo.dueDate) {
+            this.todo.dueDate = this.todo.dueDate.split('T')[0];
+          }
         }
       });
     }
