@@ -16,7 +16,7 @@ const ISSUE_NUMBER  = parseInt(process.env.ISSUE_NUMBER);
 const ISSUE_TITLE   = process.env.ISSUE_TITLE;
 const ISSUE_BODY    = process.env.ISSUE_BODY;
 const BRANCH        = `feature/issue-${ISSUE_NUMBER}`;
-const MODEL         = "anthropic.claude-sonnet-4-5-20250929-v1:0";
+const MODEL         = "eu.anthropic.claude-sonnet-4-5-20250929-v1:0";
 
 // ─── Tools ───────────────────────────────────────────────────────────────────
 const TOOLS = [
