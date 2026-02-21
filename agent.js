@@ -1,154 +1,151 @@
-const { AnthropicBedrock } = require("@anthropic-ai/bedrock-sdk");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { Octokit } = require("@octokit/rest");
 
 // ─── Setup ───────────────────────────────────────────────────────────────────
-const anthropic = new AnthropicBedrock({
-  awsRegion:    process.env.AWS_REGION
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 const [OWNER, REPO] = process.env.REPO.split("/");
-const ISSUE_NUMBER = parseInt(process.env.ISSUE_NUMBER);
-const ISSUE_TITLE = process.env.ISSUE_TITLE;
-const ISSUE_BODY = process.env.ISSUE_BODY;
-const BRANCH = `feature/issue-${ISSUE_NUMBER}`;
-const MODEL  = "anthropic.claude-sonnet-4-5-20250929-v1:0";
+const ISSUE_NUMBER  = parseInt(process.env.ISSUE_NUMBER);
+const ISSUE_TITLE   = process.env.ISSUE_TITLE;
+const ISSUE_BODY    = process.env.ISSUE_BODY;
+const BRANCH        = `feature/issue-${ISSUE_NUMBER}`;
+const MODEL         = "gemini-2.0-flash";
 
-// ─── Tools (Octokit functions exposed to Claude) ──────────────────────────────
+// ─── Tool Definitions (Gemini format) ────────────────────────────────────────
 const TOOLS = [
   {
-    name: "get_file",
-    description: "Read a file from the GitHub repo",
-    input_schema: {
-      type: "object",
-      properties: {
-        path: { type: "string", description: "File path e.g. src/app/todo.service.ts" }
+    functionDeclarations: [
+      {
+        name: "get_file",
+        description: "Read a file from the GitHub repo",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            path: { type: "STRING", description: "File path e.g. src/app/todo.service.ts" }
+          },
+          required: ["path"]
+        }
       },
-      required: ["path"]
-    }
-  },
-  {
-    name: "list_files",
-    description: "List files in a directory of the repo",
-    input_schema: {
-      type: "object",
-      properties: {
-        path: { type: "string", description: "Directory path e.g. src/app" }
+      {
+        name: "list_files",
+        description: "List files in a directory of the repo",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            path: { type: "STRING", description: "Directory path e.g. src/app" }
+          },
+          required: ["path"]
+        }
       },
-      required: ["path"]
-    }
-  },
-  {
-    name: "create_branch",
-    description: "Create a new feature branch from main",
-    input_schema: {
-      type: "object",
-      properties: {
-        branch: { type: "string", description: "Branch name e.g. feature/issue-42" }
+      {
+        name: "create_branch",
+        description: "Create a new feature branch from main",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            branch: { type: "STRING", description: "Branch name e.g. feature/issue-42" }
+          },
+          required: ["branch"]
+        }
       },
-      required: ["branch"]
-    }
-  },
-  {
-    name: "commit_file",
-    description: "Create or update a file on the feature branch",
-    input_schema: {
-      type: "object",
-      properties: {
-        path:    { type: "string", description: "File path" },
-        content: { type: "string", description: "Full file content" },
-        message: { type: "string", description: "Commit message" }
+      {
+        name: "commit_file",
+        description: "Create or update a file on the feature branch",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            path:    { type: "STRING", description: "File path" },
+            content: { type: "STRING", description: "Full file content" },
+            message: { type: "STRING", description: "Commit message" }
+          },
+          required: ["path", "content", "message"]
+        }
       },
-      required: ["path", "content", "message"]
-    }
-  },
-  {
-    name: "create_pull_request",
-    description: "Raise a PR from the feature branch to main",
-    input_schema: {
-      type: "object",
-      properties: {
-        title: { type: "string", description: "PR title" },
-        body:  { type: "string", description: "PR description listing all changes" }
+      {
+        name: "create_pull_request",
+        description: "Raise a PR from the feature branch to main",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            title: { type: "STRING", description: "PR title" },
+            body:  { type: "STRING", description: "PR description listing all changes" }
+          },
+          required: ["title", "body"]
+        }
       },
-      required: ["title", "body"]
-    }
-  },
-  {
-    name: "comment_on_issue",
-    description: "Post a comment on the GitHub issue",
-    input_schema: {
-      type: "object",
-      properties: {
-        body: { type: "string", description: "Comment text" }
-      },
-      required: ["body"]
-    }
+      {
+        name: "comment_on_issue",
+        description: "Post a comment on the GitHub issue",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            body: { type: "STRING", description: "Comment text" }
+          },
+          required: ["body"]
+        }
+      }
+    ]
   }
 ];
 
 // ─── Tool Executor (Octokit calls) ────────────────────────────────────────────
-async function executeTool(name, input) {
-  console.log(`\n🔧 Tool: ${name}`, JSON.stringify(input, null, 2));
+async function executeTool(name, args) {
+  console.log(`\n🔧 Tool: ${name}`, JSON.stringify(args, null, 2));
 
   if (name === "get_file") {
     const { data } = await octokit.repos.getContent({
-      owner: OWNER, repo: REPO, path: input.path, ref: BRANCH
+      owner: OWNER, repo: REPO, path: args.path, ref: BRANCH
     }).catch(() =>
-      // fallback to main if branch doesn't exist yet
-      octokit.repos.getContent({ owner: OWNER, repo: REPO, path: input.path })
+      octokit.repos.getContent({ owner: OWNER, repo: REPO, path: args.path })
     );
     return Buffer.from(data.content, "base64").toString("utf8");
   }
 
   if (name === "list_files") {
     const { data } = await octokit.repos.getContent({
-      owner: OWNER, repo: REPO, path: input.path
+      owner: OWNER, repo: REPO, path: args.path
     });
     return data.map(f => `${f.type === "dir" ? "📁" : "📄"} ${f.path}`).join("\n");
   }
 
   if (name === "create_branch") {
-    // Get SHA of main branch
     const { data: ref } = await octokit.git.getRef({
       owner: OWNER, repo: REPO, ref: "heads/main"
     });
     await octokit.git.createRef({
       owner: OWNER, repo: REPO,
-      ref: `refs/heads/${input.branch}`,
+      ref: `refs/heads/${args.branch}`,
       sha: ref.object.sha
     });
-    return `Branch ${input.branch} created successfully`;
+    return `Branch ${args.branch} created successfully`;
   }
 
   if (name === "commit_file") {
-    // Get existing file SHA if it exists (needed for updates)
     let sha;
     try {
       const { data } = await octokit.repos.getContent({
-        owner: OWNER, repo: REPO, path: input.path, ref: BRANCH
+        owner: OWNER, repo: REPO, path: args.path, ref: BRANCH
       });
       sha = data.sha;
-    } catch {
-      // New file — no SHA needed
-    }
+    } catch { /* new file */ }
 
     await octokit.repos.createOrUpdateFileContents({
       owner: OWNER, repo: REPO,
-      path: input.path,
-      message: input.message,
-      content: Buffer.from(input.content).toString("base64"),
+      path: args.path,
+      message: args.message,
+      content: Buffer.from(args.content).toString("base64"),
       branch: BRANCH,
       ...(sha && { sha })
     });
-    return `File ${input.path} committed to ${BRANCH}`;
+    return `File ${args.path} committed to ${BRANCH}`;
   }
 
   if (name === "create_pull_request") {
     const { data: pr } = await octokit.pulls.create({
       owner: OWNER, repo: REPO,
-      title: input.title,
-      body: input.body,
+      title: args.title,
+      body: args.body,
       head: BRANCH,
       base: "main"
     });
@@ -159,7 +156,7 @@ async function executeTool(name, input) {
     await octokit.issues.createComment({
       owner: OWNER, repo: REPO,
       issue_number: ISSUE_NUMBER,
-      body: input.body
+      body: args.body
     });
     return "Comment posted on issue";
   }
@@ -171,85 +168,89 @@ async function executeTool(name, input) {
 async function runAgent() {
   console.log(`\n🚀 AI Agent starting...`);
   console.log(`📋 Issue #${ISSUE_NUMBER}: ${ISSUE_TITLE}`);
+  console.log(`🤖 Model: ${MODEL}`);
   console.log(`🌿 Target branch: ${BRANCH}\n`);
 
-  const messages = [
-    {
-      role: "user",
-      content: `
+  const model = genAI.getGenerativeModel({
+    model: MODEL,
+    tools: TOOLS,
+    systemInstruction: `
 You are an AI coding agent working on the GitHub repo ${OWNER}/${REPO}.
 This is a Smart Todo app built with .NET Core backend, Azure OpenAI, and Angular frontend.
 
-A new GitHub issue has been raised:
-
-Issue #${ISSUE_NUMBER}: ${ISSUE_TITLE}
-${ISSUE_BODY}
-
-Your job:
+Your job when given an issue:
 1. Explore the repo structure to understand the codebase
 2. Implement the feature described in the issue
-3. Create branch: ${BRANCH}
+3. Create the feature branch before committing any files
 4. Commit all changed files to that branch
-5. Raise a PR titled: "${ISSUE_TITLE}" linking to issue #${ISSUE_NUMBER}
-6. Comment on issue #${ISSUE_NUMBER} with the PR link
+5. Raise a PR linking to the issue
+6. Comment on the issue with the PR link
 
 Rules:
 - Use tools only — no local file system
 - Always create the branch before committing files
 - Read files before editing them so you understand existing patterns
 - Make all changes consistent across .NET backend and Angular frontend
-      `.trim()
-    }
-  ];
+    `.trim()
+  });
 
-  // Agentic loop — keeps running until Claude stops calling tools
+  const chat = model.startChat();
+
+  const initialMessage = `
+A new GitHub issue has been raised:
+
+Issue #${ISSUE_NUMBER}: ${ISSUE_TITLE}
+${ISSUE_BODY}
+
+Branch to use: ${BRANCH}
+
+Please implement this feature now.
+  `.trim();
+
+  let response = await chat.sendMessage(initialMessage);
+
+  // Agentic loop — keep processing tool calls until Gemini stops
   while (true) {
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 8096,
-      tools: TOOLS,
-      messages
-    });
+    const candidate = response.response.candidates[0];
+    const parts = candidate.content.parts;
 
-    console.log(`\n🧠 Claude: stop_reason = ${response.stop_reason}`);
+    // Collect all function calls in this response
+    const functionCalls = parts.filter(p => p.functionCall);
 
-    // Add Claude's response to message history
-    messages.push({ role: "assistant", content: response.content });
-
-    // If Claude is done — no more tool calls
-    if (response.stop_reason === "end_turn") {
+    if (functionCalls.length === 0) {
+      // No more tool calls — Gemini is done
+      const textParts = parts.filter(p => p.text).map(p => p.text).join("\n");
+      console.log("\n🧠 Gemini final response:", textParts);
       console.log("\n✅ Agent completed successfully!");
       break;
     }
 
-    // Process tool calls Claude requested
+    // Execute all tool calls and collect results
     const toolResults = [];
-    for (const block of response.content) {
-      if (block.type === "tool_use") {
-        try {
-          const result = await executeTool(block.name, block.input);
-          console.log(`✅ Result: ${result}`);
-          toolResults.push({
-            type: "tool_result",
-            tool_use_id: block.id,
-            content: result
-          });
-        } catch (err) {
-          console.error(`❌ Tool error: ${err.message}`);
-          toolResults.push({
-            type: "tool_result",
-            tool_use_id: block.id,
-            content: `Error: ${err.message}`,
-            is_error: true
-          });
-        }
+    for (const part of functionCalls) {
+      const { name, args } = part.functionCall;
+      try {
+        const result = await executeTool(name, args);
+        console.log(`✅ Result: ${result}`);
+        toolResults.push({
+          functionResponse: {
+            name,
+            response: { result }
+          }
+        });
+      } catch (err) {
+        console.error(`❌ Tool error: ${err.message}`);
+        toolResults.push({
+          functionResponse: {
+            name,
+            response: { error: err.message }
+          }
+        });
       }
     }
 
-    // Feed tool results back to Claude for next iteration
-    if (toolResults.length > 0) {
-      messages.push({ role: "user", content: toolResults });
-    }
+    // Send tool results back to Gemini
+    response = await chat.sendMessage(toolResults);
   }
 }
 
