@@ -2,20 +2,33 @@ name: AI Issue Agent
 
 on:
   issues:
-    types: [labeled]  # triggers when you add a label like "ai-implement"
+    types: [labeled]
 
 jobs:
   implement-issue:
+    if: github.event.label.name == 'ai-implement'
     runs-on: ubuntu-latest
+
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install @anthropic-ai/sdk @octokit/rest
+
       - name: Run AI Agent
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
-          REPO: ${{ github.repository }}
-        run: |
-          npm install -g @anthropic-ai/sdk
-          node agent.js
+        run: node agent.js
