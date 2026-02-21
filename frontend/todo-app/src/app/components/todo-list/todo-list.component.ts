@@ -66,4 +66,19 @@ export class TodoListComponent implements OnInit {
   onOpenEdit(todo: Todo) {
     this.openEdit.emit(todo);
   }
+
+  getPriorityClass(priority: string | undefined): string {
+    if (!priority) return '';
+    
+    switch (priority.toLowerCase()) {
+      case 'high':
+        return 'priority-high';
+      case 'medium':
+        return 'priority-medium';
+      case 'low':
+        return 'priority-low';
+      default:
+        return '';
+    }
+  }
 }
