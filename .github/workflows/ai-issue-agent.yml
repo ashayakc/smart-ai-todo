@@ -8,6 +8,11 @@ jobs:
   implement-issue:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write        # ← allows committing files
+      pull-requests: write   # ← allows creating PRs
+      issues: write          # ← allows commenting on issues
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
