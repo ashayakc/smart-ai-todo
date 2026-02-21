@@ -179,8 +179,8 @@ async function runAgent() {
       content: `
 You are an AI coding agent working on the GitHub repo ${OWNER}/${REPO}.
 This is a Smart Todo app built with .NET Core backend, Azure OpenAI, and Angular frontend.
-- Backend: .NET Core in /SmartTodo directory
-- Frontend: Angular in /smart-todo-ui or similar
+- Backend: .NET Core in /backend/SmartTodo directory
+- Frontend: Angular in /frontend/todo-app directory
 - Always call list_files first to confirm exact paths before reading or committing files
 - Never guess file paths
 
