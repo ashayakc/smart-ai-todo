@@ -38,13 +38,13 @@ using (var scope = app.Services.CreateScope())
     // Check if there are already any todos
     if (!dbContext.Todos.Any())
     {
-        // Add 20 sample Todo items
+        // Add sample Todo items with priority levels
         dbContext.Todos.AddRange(
-            new Todo { Title = "Grocery Shopping", Description = "Buy milk, eggs, and bread", Completed = false, Category = "Home" },
-            new Todo { Title = "Pay Bills", Description = "Pay rent and utilities", Completed = false, Category = "Finance" },
-            new Todo { Title = "Schedule Doctor Appointment", Description = "Book a checkup for next week", Completed = false },
-            new Todo { Title = "Write Blog Post", Description = "Draft the article for Friday", Completed = false, Category = "Work" },
-            new Todo { Title = "Clean the House", Description = "Vacuum and mop the floors", Completed = false, Category = "Home" }
+            new Todo { Title = "Grocery Shopping", Description = "Buy milk, eggs, and bread", Completed = false, Category = "Home", Priority = "High" },
+            new Todo { Title = "Pay Bills", Description = "Pay rent and utilities", Completed = false, Category = "Finance", Priority = "High" },
+            new Todo { Title = "Schedule Doctor Appointment", Description = "Book a checkup for next week", Completed = false, Priority = "Medium" },
+            new Todo { Title = "Write Blog Post", Description = "Draft the article for Friday", Completed = false, Category = "Work", Priority = "Medium" },
+            new Todo { Title = "Clean the House", Description = "Vacuum and mop the floors", Completed = false, Category = "Home", Priority = "Low" }
             );
 
         // Save the changes to the database
