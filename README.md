@@ -17,13 +17,13 @@
 - Azure Open AI
 
 ## Summary:
-The application is a simple to-do list manager enhanced with artificial intelligence capabilities through the integration of Azure Open AI. The project utilizes a .NET Core backend, an Angular frontend, and Entity Framework Core for data management. Key features include basic task management (creation, description, completion tracking) and AI-powered task categorization via natural language processing. Furthermore, a chatbot functionality allows users to interact with and manage their to-do items through natural language commands.
+The application is a simple to-do list manager enhanced with artificial intelligence capabilities through the integration of Azure Open AI. The project utilizes a .NET Core backend, an Angular frontend, and Entity Framework Core for data management. Key features include basic task management (creation, description, completion tracking, priority levels) and AI-powered task categorization via natural language processing. Furthermore, a chatbot functionality allows users to interact with and manage their to-do items through natural language commands.
 
 ### Main Themes and Important Ideas/Facts:
 
 1. #### Core Functionality: Enhanced To-Do List:
 
-    The primary goal of the application is to provide a "simple TODO app with bare minimal features to capture the daily tasks along with some descriptions if applicable and track them if they are complete. This indicates a focus on fundamental task management: creating tasks, adding details, and marking them as done.
+    The primary goal of the application is to provide a "simple TODO app with bare minimal features to capture the daily tasks along with some descriptions if applicable and track them if they are complete. This indicates a focus on fundamental task management: creating tasks, adding details, marking them as done, and assigning priority levels (High, Medium, Low) to help organize tasks by importance.
 
 2. #### AI-Powered categorization:
 
@@ -33,3 +33,11 @@ The application is a simple to-do list manager enhanced with artificial intellig
 3. #### Chatbot Interaction:
 
     The application includes a "chatbot feature where the user can talk to and perform all the actions related to TODO via chat. This highlights a natural language interface for managing tasks, allowing users to "create, update, delete, get count of TODO items based on category or similar" through conversation. This offers a more intuitive and potentially faster way to interact with the to-do list.
+
+## Features:
+
+- **Task Management**: Create, edit, delete, and mark tasks as complete
+- **Priority Levels**: Assign priority (High, Medium, Low) to each task with color-coded visual indicators
+- **AI Categorization**: Automatic task categorization using Azure OpenAI
+- **Natural Language Chatbot**: Manage tasks through conversational interface
+- **Responsive UI**: Clean and intuitive Angular-based interface
