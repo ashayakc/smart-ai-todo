@@ -1,4 +1,4 @@
-const AnthropicBedrock = require("@anthropic-ai/bedrock").AnthropicBedrock;
+const { AnthropicBedrock } = require("@anthropic-ai/bedrock-sdk");
 const { Octokit } = require("@octokit/rest");
 
 // ─── Setup ───────────────────────────────────────────────────────────────────
