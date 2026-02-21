@@ -88,6 +88,17 @@ const TOOLS = [
       },
       required: ["body"]
     }
+  },
+  {
+    name: "search_code",
+    description: "Search for a keyword in the repo before reading files",
+    input_schema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Search term e.g. 'Todo model'" }
+      },
+      required: ["query"]
+    }
   }
 ];
 
@@ -166,6 +177,16 @@ async function executeTool(name, input) {
   throw new Error(`Unknown tool: ${name}`);
 }
 
+if (name === "search_code") {
+  const { data } = await octokit.search.code({
+    q: `${input.query}+repo:${OWNER}/${REPO}`
+  });
+  return data.items
+    .slice(0, 5)
+    .map(i => `${i.path}: ${i.name}`)
+    .join("\n");
+}
+
 // ─── Agentic Loop ─────────────────────────────────────────────────────────────
 async function runAgent() {
   console.log(`\n🚀 AI Agent starting...`);
@@ -179,9 +200,10 @@ async function runAgent() {
       content: `
 You are an AI coding agent working on the GitHub repo ${OWNER}/${REPO}.
 This is a Smart Todo app built with .NET Core backend, Azure OpenAI, and Angular frontend.
-- Backend: .NET Core in /backend/SmartTodo directory
-- Frontend: Angular in /frontend/todo-app directory
-- Always call list_files first to confirm exact paths before reading or committing files
+- FIRST — read the CLAUDE.md file in the repo root. 
+- It contains the exact repo structure and conventions.
+- Use it to navigate directly to relevant files.
+- Do NOT explore or list directories unless CLAUDE.md doesn't cover what you need.
 - Never guess file paths
 
 A new GitHub issue has been raised:
@@ -198,11 +220,12 @@ Your job:
 6. Comment on issue #${ISSUE_NUMBER} with the PR link
 
 Rules:
-- Use tools only — no local file system
-- Always create the branch before committing files
-- Read files before editing them so you understand existing patterns
-- Make all changes consistent across .NET backend and Angular frontend
-      `.trim()
+- Read CLAUDE.md first — always
+- Only read files directly needed for this issue
+- Never read config files, lock files, or build output
+- Create branch BEFORE committing any files
+- Update both backend AND frontend when model changes
+`.trim()
     }
   ];
 
