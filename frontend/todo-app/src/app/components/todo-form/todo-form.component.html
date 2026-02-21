@@ -16,6 +16,11 @@
         <label for="category" class="form-label">Category</label>
         <input type="text" class="form-control" id="category" [(ngModel)]="todo.category" name="category">
       </div>
+
+      <div class="mb-3">
+        <label for="dueDate" class="form-label">Due Date</label>
+        <input type="date" class="form-control" id="dueDate" [(ngModel)]="todo.dueDate" name="dueDate">
+      </div>
   
       <div class="form-check mb-3">
         <input type="checkbox" class="form-check-input" [(ngModel)]="todo.completed" name="completed" />
