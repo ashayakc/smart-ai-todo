@@ -6,7 +6,6 @@ on:
 
 jobs:
   implement-issue:
-    if: github.event.label.name == 'ai-implement'
     runs-on: ubuntu-latest
 
     steps:
