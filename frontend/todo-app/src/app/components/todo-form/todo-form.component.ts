@@ -16,9 +16,11 @@ export class TodoFormComponent implements OnInit {
     id: 0,
     title: '',
     description: '',
-    completed: false
+    completed: false,
+    priority: 'Medium'
   };
   isEditMode = false;
+  priorityLevels = ['High', 'Medium', 'Low'];
 
   constructor(
     private todoService: TodoService,
@@ -33,6 +35,9 @@ export class TodoFormComponent implements OnInit {
       this.todoService.getTodo(+id).subscribe(t => {
         if (t) {
           this.todo = { ...t };
+          if (!this.todo.priority) {
+            this.todo.priority = 'Medium';
+          }
         }
       });
     }
