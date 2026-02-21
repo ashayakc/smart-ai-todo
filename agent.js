@@ -174,17 +174,17 @@ async function executeTool(name, input) {
     return "Comment posted on issue";
   }
 
-  throw new Error(`Unknown tool: ${name}`);
-}
+  if (name === "search_code") {
+    const { data } = await octokit.search.code({
+      q: `${input.query}+repo:${OWNER}/${REPO}`
+    });
+    return data.items
+      .slice(0, 5)
+      .map(i => `${i.path}: ${i.name}`)
+      .join("\n");
+  }
 
-if (name === "search_code") {
-  const { data } = await octokit.search.code({
-    q: `${input.query}+repo:${OWNER}/${REPO}`
-  });
-  return data.items
-    .slice(0, 5)
-    .map(i => `${i.path}: ${i.name}`)
-    .join("\n");
+  throw new Error(`Unknown tool: ${name}`);
 }
 
 // ─── Agentic Loop ─────────────────────────────────────────────────────────────
