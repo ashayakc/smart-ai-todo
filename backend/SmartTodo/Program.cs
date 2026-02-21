@@ -40,11 +40,11 @@ using (var scope = app.Services.CreateScope())
     {
         // Add 20 sample Todo items
         dbContext.Todos.AddRange(
-            new Todo { Title = "Grocery Shopping", Description = "Buy milk, eggs, and bread", Completed = false, Category = "Home" },
-            new Todo { Title = "Pay Bills", Description = "Pay rent and utilities", Completed = false, Category = "Finance" },
-            new Todo { Title = "Schedule Doctor Appointment", Description = "Book a checkup for next week", Completed = false },
-            new Todo { Title = "Write Blog Post", Description = "Draft the article for Friday", Completed = false, Category = "Work" },
-            new Todo { Title = "Clean the House", Description = "Vacuum and mop the floors", Completed = false, Category = "Home" }
+            new Todo { Title = "Grocery Shopping", Description = "Buy milk, eggs, and bread", Completed = false, Category = "Home", DueDate = DateTime.Now.AddDays(2) },
+            new Todo { Title = "Pay Bills", Description = "Pay rent and utilities", Completed = false, Category = "Finance", DueDate = DateTime.Now.AddDays(5) },
+            new Todo { Title = "Schedule Doctor Appointment", Description = "Book a checkup for next week", Completed = false, DueDate = DateTime.Now.AddDays(7) },
+            new Todo { Title = "Write Blog Post", Description = "Draft the article for Friday", Completed = false, Category = "Work", DueDate = DateTime.Now.AddDays(3) },
+            new Todo { Title = "Clean the House", Description = "Vacuum and mop the floors", Completed = false, Category = "Home", DueDate = DateTime.Now.AddDays(1) }
             );
 
         // Save the changes to the database
