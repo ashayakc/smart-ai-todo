@@ -3,9 +3,7 @@ const { Octokit } = require("@octokit/rest");
 
 // ─── Setup ───────────────────────────────────────────────────────────────────
 const anthropic = new AnthropicBedrock({
-  awsAccessKey: process.env.AWS_ACCESS_KEY_ID,
-  awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
-  awsSessionToken: process.env.AWS_SESSION_TOKEN,
+  awsBedrockApiKey: process.env.BEDROCK_API_KEY,
   awsRegion:    process.env.AWS_REGION
 });
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
