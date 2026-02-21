@@ -12,6 +12,9 @@
           <p class="card-text status">
             <small class="text-muted">Status: {{ todo.completed ? 'Completed' : 'Pending' }}</small>
           </p>
+          <p class="card-text due-date" *ngIf="todo.dueDate">
+            <small class="text-muted">Due Date: {{ todo.dueDate | date:'mediumDate' }}</small>
+          </p>
         </div>
         <div class="right-section">
           <p class="card-text category">{{ todo.category }}</p>
