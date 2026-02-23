@@ -12,6 +12,9 @@
           <p class="card-text status">
             <small class="text-muted">Status: {{ todo.completed ? 'Completed' : 'Pending' }}</small>
           </p>
+          <p class="card-text priority">
+            <small class="text-muted">Priority: <strong>{{ todo.priority }}</strong></small>
+          </p>
         </div>
         <div class="right-section">
           <p class="card-text category">{{ todo.category }}</p>
