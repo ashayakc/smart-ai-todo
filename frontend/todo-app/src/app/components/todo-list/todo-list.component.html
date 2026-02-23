@@ -11,6 +11,7 @@
           <p class="card-text">{{ todo.description }}</p>
           <p class="card-text status">
             <small class="text-muted">Status: {{ todo.completed ? 'Completed' : 'Pending' }}</small>
+            <span *ngIf="todo.priority" class="ms-3">Priority: <strong>{{ todo.priority }}</strong></span>
           </p>
         </div>
         <div class="right-section">
