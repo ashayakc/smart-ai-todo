@@ -16,6 +16,13 @@
         <label for="category" class="form-label">Category</label>
         <input type="text" class="form-control" id="category" [(ngModel)]="todo.category" name="category">
       </div>
+
+      <div class="mb-3">
+        <label for="priority" class="form-label">Priority</label>
+        <select class="form-select" id="priority" [(ngModel)]="todo.priority" name="priority">
+          <option *ngFor="let priority of priorities" [value]="priority">{{ priority }}</option>
+        </select>
+      </div>
   
       <div class="form-check mb-3">
         <input type="checkbox" class="form-check-input" [(ngModel)]="todo.completed" name="completed" />
